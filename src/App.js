@@ -3,20 +3,25 @@ import axios from 'axios'
 import Form from './component/form'
 import Header from './component/header'
 import Navbar from './component/navbar'
-import Table from './component/table'
 
 class TodoApp extends Component {
   constructor(props) {
     super(props);
-    this.state = { items: [{
-      id : 1,
-      text : "Mancing"
-    },{
-      id : 2,
-      text : "Kuliah"
-    }], text: '', seconds : 0 };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = { items: [], text: '', seconds : 0 };
+    this.changeTodo = this.changeTodo.bind(this);
+    this.submitForm = this.submitForm.bind(this);
+  }
+  componentWillMount() {
+    axios.get('/artikel/data')
+    .then(resp => {
+      console.log(resp)
+      this.setState({
+        items : resp.data.artikel.rows
+      })
+    })
+    .catch(err => {
+      console.log(err)
+    })
   }
 
   render() {
@@ -26,11 +31,11 @@ class TodoApp extends Component {
       <Navbar></Navbar>
       <div className="content-wrapper">
       <section className="content">
-      <Form submit={this.handleSubmit} change={this.handleChange} text={this.state.text}/><br/>
+      <Form onSubmit={this.submitForm} onChange={this.changeTodo}  text={this.state.text} /><br/>
       <ul>
       {
         this.state.items.map(item => (
-          <li key={item.id}>{item.text}</li>
+          <li key={item.id}>{item.jenis_bahasan}</li>
           ))
       }
       </ul>
@@ -39,20 +44,14 @@ class TodoApp extends Component {
       </div>
       );
   }
-  handleChange(element){
-    this.setState({text: element.target.value})
+
+  changeTodo(newTodo){
+    this.setState({
+      text: newTodo
+    })
   }
 
-  handleSubmit(element){
-    element.preventDefault();
-    if (!this.state.text.length) {
-      return
-    }
-    const newItem = {
-      text : this.state.text,
-      id :  Date.now()  
-    }
-
+  submitForm(newItem){
     this.setState(prevState => ({
       items :  prevState.items.concat(newItem),
       text : ''

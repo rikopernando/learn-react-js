@@ -37,8 +37,8 @@ class Form extends Component {
 			</div>	
 			</div>	
 			)		
+		}
+
 	}
 
-}
-
-export default Form
+	export default Form
